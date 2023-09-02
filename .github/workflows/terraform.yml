@@ -44,6 +44,8 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
       - name: "Terraform init"
-        run: terraform -chdir=/cloudops/oracle init
+        run: |
+          ls -a
+          terraform -chdir=cloudops/oracle init
       - name: "Terraform apply"
-        run: terraform -chdir=/cloudops/oracle apply -auto-approve -var COMPARTMENT_ID="${{env.OCID}}" -var REGION="${{env.OCI_REGION}}"
+        run: terraform -chdir=cloudops/oracle apply -auto-approve -var COMPARTMENT_ID="${{env.OCID}}" -var REGION="${{env.OCI_REGION}}"
