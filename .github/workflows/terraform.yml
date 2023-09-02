@@ -17,8 +17,8 @@ jobs:
           export-env: true
         env:
           OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
-          OCID: "op://git/ORACLE/OCID"
-          OCI_REGION: "op://git/ORACLE/OCI_REGION"
+          #OCID: "op://git/ORACLE/OCID"
+          #OCI_REGION: "op://git/ORACLE/OCI_REGION"
           OCI_CONFIG: "op://git/ORACLE/OCI_CONFIG"
           OCI_KEY_FILE: "op://git/ORACLE/OCI_KEY_FILE" 
       - name: "Install OCI CLI"
@@ -48,4 +48,4 @@ jobs:
           ls -a
           terraform -chdir=cloudops/oracle init
       - name: "Terraform apply"
-        run: terraform -chdir=cloudops/oracle apply -auto-approve -var COMPARTMENT_ID="${{env.OCID}}" -var REGION="${{env.OCI_REGION}}"
+        run: terraform -chdir=cloudops/oracle apply -auto-approve
