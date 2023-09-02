@@ -26,8 +26,8 @@ jobs:
       - name: "Install OCI CLI"
         run: |
           mkdir ~/.oci
-          echo "${{ secrets.OCI_CONFIG }}" > ~/.oci/config
-          echo "${{ secrets.OCI_KEY_FILE }}" > ~/.oci/key.pem
+          echo "${{ env.OCI_CONFIG }}" > ~/.oci/config
+          echo "${{ env.OCI_KEY_FILE }}" > ~/.oci/key.pem
           curl -L -O https://raw.githubusercontent.com/oracle/oci-cli/master/scripts/install/install.sh
           chmod +x install.sh
           ./install.sh --accept-all-defaults
