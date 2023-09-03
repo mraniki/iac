@@ -1,0 +1,58 @@
+name: 🛰️Terraform
+on:
+  workflow_call:
+  workflow_dispatch:
+  
+jobs:
+  terraform:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Load Credentials
+        id: op-load-secrets
+        uses: 1password/load-secrets-action@v1
+        with:
+          export-env: false
+        env:
+          OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
+          TF_API_TOKEN: "op://git/terraform/TF_API_TOKEN"
+          CLOUDFLARE_API_TOKEN: "op://git/cloudflare/CLOUDFLARE_API_TOKEN"
+          HCLOUD_TOKEN: "op://git/p_hzn/HCLOUD_TOKEN"
+
+      - name: Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          cli_config_credentials_token: ${{ steps.op-load-secrets.outputs.TF_API_TOKEN }}
+
+      - name: Terraform Init
+        id: init
+        run: terraform init
+
+      # - run: |
+      #     terraform apply \
+      #     -input=false \
+      #     -no-color \
+      #     -auto-approve
+      #   working-directory: ./terraform
+      #   env:
+      #     TF_VAR_CLOUDFLARE_APITOKEN: ${{ secrets.TF_VAR_CLOUDFLARE_APITOKEN }}
+      #     TF_VAR_HCLOUD_TOKEN: ${{ secrets.TF_VAR_HCLOUD_TOKEN }}
+
+      # - run: |
+      #     ansible-galaxy install -r requirements.yaml
+      #   working-directory: ./ansible
+
+      # - run: |
+      #     ansible-playbook kubenodes.yaml \
+      #     --inventory inventory.yaml \
+      #     --verbose \
+      #     --private-key ../kubenode_ssh.key
+      #   working-directory: ./ansible
+      #   env:
+      #     TAILSCALE_AUTH_TOKEN: ${{ secrets.TAILSCALE_AUTH_TOKEN }}
+      #     TRANSCRYPT_PASSWORD: ${{ secrets.TRANSCRYPT_PASSWORD }}
+      #     GH_TOKEN_FOR_FLUX: ${{ secrets.GH_TOKEN_FOR_FLUX }}
+      #     AGE_KEY: ${{ secrets.AGE_KEY }}
+      #     CLUSTER_NAME: pegasus

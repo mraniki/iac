@@ -1,8 +1,6 @@
 name: 🛰️Terraform
 on:
-  #push:
-   # branches:
-  #    - main
+  workflow_call:
   workflow_dispatch:
   
 jobs:
@@ -18,11 +16,11 @@ jobs:
           export-env: false
         env:
           OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
-          OCID: "op://git/ORACLE/OCID"
-          OCI_REGION: "op://git/ORACLE/OCI_REGION"
-          OCI_CONFIG: "op://git/ORACLE/OCI_CONFIG"
-          OCI_KEY_FILE: "op://git/ORACLE/OCI_KEY_FILE"
-          OCI_TENANCY_ID: "op://git/ORACLE/OCI_TENANCY_ID"
+          OCID: "op://git/p_oci/OCID"
+          OCI_REGION: "op://git/p_oci/OCI_REGION"
+          OCI_CONFIG: "op://git/p_oci/OCI_CONFIG"
+          OCI_KEY_FILE: "op://git/p_oci/OCI_KEY_FILE"
+          OCI_TENANCY_ID: "op://git/p_oci/OCI_TENANCY_ID"
 
       - name: "Write OCI Config & Key Files"
         run: |
@@ -56,11 +54,11 @@ jobs:
           
       - name: "Terraform init"
         run: |
-          terraform -chdir=iac/oracle init
+          terraform -chdir=iac/infra/oci init
           
       - name: "Terraform apply"
         run: |
-          terraform -chdir=iac/oracle apply -auto-approve \
+          terraform -chdir=iac/infra/oci init apply -auto-approve \
           -var COMPARTMENT_ID="${{steps.op-load-secrets.outputs.OCID}}" \
           -var REGION="${{steps.op-load-secrets.outputs.OCI_REGION}}" \
           -var TENANCY_ID="${{steps.op-load-secrets.outputs.OCI_TENANCY_ID}}"

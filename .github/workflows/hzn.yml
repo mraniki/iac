@@ -1,0 +1,70 @@
+name: "management cluster terraform apply on hcloud"
+
+on:
+  workflow_dispatch:
+  workflow_call:
+    inputs:
+      workspace:
+        required: true
+        type: string
+      var_file:
+        required: true
+        type: string
+      prefix:
+        required: true
+        type: string
+      environment:
+        required: true
+        type: string
+    secrets:
+      tf_api_token:
+        required: true
+      hcloud_secret:
+        required: true
+      hcloud_ssh_key_private:
+        required: true
+      hcloud_ssh_key_public:
+        required: true
+
+jobs:
+  terraform:
+    name: "Terraform"
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+
+    # Use the Bash shell regardless whether the GitHub Actions runner is ubuntu-latest, macos-latest, or windows-latest
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+      # Checkout the repository to the GitHub Actions runner
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      # Install the latest version of Terraform CLI and configure the Terraform CLI configuration file with a Terraform Cloud user API token
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v1
+        with:
+          cli_config_credentials_token: ${{ secrets.tf_api_token }}
+
+      # Initialize a new or existing Terraform working directory by creating initial files, loading any remote state, downloading modules, etc.
+      - name: Terraform Init
+        run: TF_WORKSPACE=fallback terraform init -input=false
+
+      # Selecting correct workspace (and create if not exist)
+      - name: Terraform Workspace Select
+        run: terraform workspace select ${{ inputs.workspace }} || terraform workspace new ${{ inputs.workspace }}
+
+      # Checks that all Terraform configuration files adhere to a canonical format
+      - name: Terraform Format
+        run: terraform fmt -check
+
+        # On push to branch, build or change infrastructure according to Terraform configuration files
+      - name: Terraform Apply
+        run: |
+          terraform apply -auto-approve -var-file=${{ inputs.var_file }} \
+            -var prefix="${{ inputs.prefix }}" \
+            -var hcloud_secret="${{ secrets.hcloud_secret }}" \
+            -var hcloud_ssh_key_private="${{ secrets.hcloud_ssh_key_private }}" \
+            -var hcloud_ssh_key_public="${{ secrets.hcloud_ssh_key_public }}"
