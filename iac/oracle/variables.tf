@@ -7,3 +7,9 @@ variable "REGION" {
   type        = string
   description = "The region to provision the resources in"
 }
+
+variable "TENANCY_ID" {
+  type        = string
+}
+
+
