@@ -70,8 +70,7 @@ jobs:
           
       - name: "Terraform apply"
         run: |
-          terraform -chdir=iac/oracle apply 
-
+          terraform -chdir=iac/oracle apply -auto-approve -var COMPARTMENT_ID="${{steps.op-load-secrets.outputs.OCID}}" -var REGION="${{steps.op-load-secrets.outputs.OCI_REGION}}"
 
 
       # - name: 'Prepare SSH key and config'
