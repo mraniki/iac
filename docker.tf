@@ -1,0 +1,12 @@
+terraform {
+  required_providers {
+    docker = {
+      source = "kreuzwerker/docker"
+    }
+  }
+}
+
+# Configure the docker provider
+provider "docker" {
+  host = "ssh://${var.docker_connect_hostname}"
+}
