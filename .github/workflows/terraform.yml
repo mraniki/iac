@@ -20,7 +20,15 @@ jobs:
           OCID: "op://git/ORACLE/OCID"
           OCI_REGION: "op://git/ORACLE/OCI_REGION"
           OCI_CONFIG: "op://git/ORACLE/OCI_CONFIG"
-          OCI_KEY_FILE: "op://git/ORACLE/OCI_KEY_FILE" 
+          OCI_KEY_FILE: "op://git/ORACLE/OCI_KEY_FILE"
+          SSH_PRIVATE_KEY_FILE: "op://git/ORACLE/SSH_PRIVATE_KEY_FILE"
+          SSH_PUBLIC_KEY_FILE:  "op://git/ORACLE/SSH_PUBLIC_KEY_FILE"
+      - name: 'Prepare SSH key and config'
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY_FILE }}" > ~/.ssh/id_rsa
+          echo "${{ secrets.SSH_PUBLIC_KEY_FILE }}" > ~/.ssh/id_rsa.pub
+          chmod 600 ~/.ssh/id_rsa
       - name: "Install OCI CLI"
         run: |
           mkdir ~/.oci
