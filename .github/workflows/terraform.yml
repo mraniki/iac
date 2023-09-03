@@ -60,5 +60,8 @@ jobs:
           
       - name: "Terraform apply"
         run: |
-          terraform -chdir=iac/oracle apply -auto-approve -var COMPARTMENT_ID="${{steps.op-load-secrets.outputs.OCID}}" -var REGION="${{steps.op-load-secrets.outputs.OCI_REGION}}"
+          terraform -chdir=iac/oracle apply -auto-approve \
+          -var COMPARTMENT_ID="${{steps.op-load-secrets.outputs.OCID}}" \
+          -var REGION="${{steps.op-load-secrets.outputs.OCI_REGION}}" \
+          -var TENANCY_ID="${{steps.op-load-secrets.outputs.OCI_TENANCY_ID}}"
 
