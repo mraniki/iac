@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
   
 jobs:
-  apply:
+  terraform:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
