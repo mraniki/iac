@@ -24,21 +24,12 @@ jobs:
           OCI_REGION: "op://git/ORACLE/OCI_REGION"
           OCI_CONFIG: "op://git/ORACLE/OCI_CONFIG"
           OCI_KEY_FILE: "op://git/ORACLE/OCI_KEY_FILE"
-          SSH_PRIVATE_KEY_FILE: "op://git/ORACLE/SSH_PRIVATE_KEY_FILE"
-          SSH_PUBLIC_KEY_FILE:  "op://git/ORACLE/SSH_PUBLIC_KEY_FILE"
 
       - name: "Write OCI Config & Key Files"
         run: |
           mkdir ~/.oci
           echo "${{ steps.op-load-secrets.outputs.OCI_CONFIG }}" > ~/.oci/config
           echo "${{ steps.op-load-secrets.outputs.OCI_KEY_FILE }}" >> ~/.oci/key.pem
-          # echo "[DEFAULT]" >> ~/.oci/config
-          # echo "user=${{inputs.user}}" >> ~/.oci/config
-          # echo "fingerprint=${{inputs.fingerprint}}" >> ~/.oci/config
-          # echo "pass_phrase=${{inputs.pass_phrase}}" >> ~/.oci/config
-          # echo "region=${{inputs.region}}" >> ~/.oci/config
-          # echo "tenancy=${{inputs.tenancy}}" >> ~/.oci/config
-          # echo "key_file=~/.oci/key.pem" >> ~/.oci/config
         shell: bash
 
       - name: "Install OCI CLI"
@@ -72,10 +63,3 @@ jobs:
         run: |
           terraform -chdir=iac/oracle apply -auto-approve -var COMPARTMENT_ID="${{steps.op-load-secrets.outputs.OCID}}" -var REGION="${{steps.op-load-secrets.outputs.OCI_REGION}}"
 
-
-      # - name: 'Prepare SSH key and config'
-      #   run: |
-      #     mkdir -p ~/.ssh
-      #     echo "${{ env.SSH_PRIVATE_KEY_FILE }}" > ~/.ssh/id_rsa
-      #     echo "${{ env.SSH_PUBLIC_KEY_FILE }}" > ~/.ssh/id_rsa.pub
-      #     chmod 600 ~/.ssh/id_rsa
