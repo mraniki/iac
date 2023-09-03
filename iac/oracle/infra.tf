@@ -210,19 +210,11 @@ resource "oci_containerengine_node_pool" "k8s_node_pool" {
   kubernetes_version = "v1.26.2"
   name               = "k8s-node-pool"
   node_config_details {
-    dynamic placement_configs {
-    placement_configs {
+  placement_configs {
       availability_domain = data.oci_identity_availability_domains.AvailabilityDomains.availability_domains[0]["name"]
       subnet_id           = oci_core_subnet.vcn_private_subnet.id
     }
-      #for_each = local.azs
-      #content {
-       # availability_domain = placement_configs.value
-       # subnet_id           = oci_core_subnet.vcn_private_subnet.id
-      #}
-    }
     size = 2
-
   }
   node_shape = "VM.Standard.A1.Flex"
 
