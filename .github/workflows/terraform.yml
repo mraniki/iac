@@ -22,6 +22,7 @@ jobs:
           OCI_REGION: "op://git/ORACLE/OCI_REGION"
           OCI_CONFIG: "op://git/ORACLE/OCI_CONFIG"
           OCI_KEY_FILE: "op://git/ORACLE/OCI_KEY_FILE"
+          OCI_TENANCY_ID: "op://git/ORACLE/OCI_TENANCY_ID"
 
       - name: "Write OCI Config & Key Files"
         run: |
