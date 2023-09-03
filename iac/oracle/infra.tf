@@ -225,7 +225,7 @@ resource "oci_containerengine_node_pool" "k8s_node_pool" {
 
   node_source_details {
     #image_id    = data.oci_core_images.latest_image.images.0.id
-    image_id = "ocid1.image.oc1.eu-frankfurt-1.aaaaaaaaxp2zqotv37r4zycmwfqywcujsh4scenphjjs5w2ozakmidg3vs6q"
+    image_id = "ocid1.image.oc1.eu-frankfurt-1.aaaaaaaaitzn6tdyjer7jl34h2ujz74jwy5nkbukbh55ekp6oyzwrtfa4zma"
     source_type = "image"
   }
 
