@@ -134,7 +134,6 @@ resource "oci_core_subnet" "vcn_private_subnet" {
 }
 
 resource "oci_core_subnet" "vcn_public_subnet" {
-  compartment_id = var.COMPARTMENT_ID
   vcn_id         = module.vcn.vcn_id
   cidr_block     = "10.0.0.0/24"
 
@@ -144,7 +143,6 @@ resource "oci_core_subnet" "vcn_public_subnet" {
 }
 
 resource "oci_containerengine_cluster" "k8s_cluster" {
-  compartment_id     = var.COMPARTMENT_ID
   kubernetes_version = "v1.26.2"
   name               = "k8s-cluster"
   vcn_id             = module.vcn.vcn_id
@@ -167,9 +165,6 @@ resource "oci_containerengine_cluster" "k8s_cluster" {
   }
 }
 
-data "oci_identity_availability_domains" "ads" {
-  compartment_id = var.COMPARTMENT_ID
-}
 
 locals {
   # Gather a list of availability domains for use in configuring placement_configs
