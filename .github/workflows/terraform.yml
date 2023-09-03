@@ -4,18 +4,20 @@ on:
    # branches:
   #    - main
   workflow_dispatch:
+  
 jobs:
   apply:
     runs-on: ubuntu-latest
     steps:
       # - name: Install 1Password CLI
       #   uses: 1password/install-cli-action@v1
-
+      - name: Checkout
+        uses: actions/checkout@v3
       - name: Load credentials
-        # id: fetch-credentials
+        id: op-load-secrets
         uses: 1password/load-secrets-action@v1
         with:
-          export-env: true
+          export-env: false
         env:
           OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
           OCID: "op://git/ORACLE/OCID"
@@ -24,24 +26,35 @@ jobs:
           OCI_KEY_FILE: "op://git/ORACLE/OCI_KEY_FILE"
           SSH_PRIVATE_KEY_FILE: "op://git/ORACLE/SSH_PRIVATE_KEY_FILE"
           SSH_PUBLIC_KEY_FILE:  "op://git/ORACLE/SSH_PUBLIC_KEY_FILE"
-      - name: 'Prepare SSH key and config'
-        run: |
-          mkdir -p ~/.ssh
-          echo "${{ env.SSH_PRIVATE_KEY_FILE }}" > ~/.ssh/id_rsa
-          echo "${{ env.SSH_PUBLIC_KEY_FILE }}" > ~/.ssh/id_rsa.pub
-          chmod 600 ~/.ssh/id_rsa
-      - name: "Install OCI CLI"
+
+      - name: "Write OCI Config & Key Files"
         run: |
           mkdir ~/.oci
-          echo "${{ env.OCI_CONFIG }}" > ~/.oci/config
-          echo "${{ env.OCI_KEY_FILE }}" > ~/.oci/key.pem
+          echo "${{ steps.op-load-secrets.outputs.OCI_CONFIG }}" > ~/.oci/config
+          echo "${{ steps.op-load-secrets.outputs.OCI_KEY_FILE }}" >> ~/.oci/key.pem
+          # echo "[DEFAULT]" >> ~/.oci/config
+          # echo "user=${{inputs.user}}" >> ~/.oci/config
+          # echo "fingerprint=${{inputs.fingerprint}}" >> ~/.oci/config
+          # echo "pass_phrase=${{inputs.pass_phrase}}" >> ~/.oci/config
+          # echo "region=${{inputs.region}}" >> ~/.oci/config
+          # echo "tenancy=${{inputs.tenancy}}" >> ~/.oci/config
+          # echo "key_file=~/.oci/key.pem" >> ~/.oci/config
+        shell: bash
+
+      - name: "Fix OCI Config File Permissions"
+        run: |
+          oci setup repair-file-permissions --file /home/runner/.oci/config
+          oci setup repair-file-permissions --file /home/runner/.oci/key.pem
+        shell: bash
+
+      - name: "Install OCI CLI"
+        run: |
           curl -L -O https://raw.githubusercontent.com/oracle/oci-cli/master/scripts/install/install.sh
           chmod +x install.sh
           ./install.sh --accept-all-defaults
           echo "/home/runner/bin" >> $GITHUB_PATH
           exec -l $SHELL
-          oci setup repair-file-permissions --file /home/runner/.oci/config
-          oci setup repair-file-permissions --file /home/runner/.oci/key.pem
+          
       - name: "Install terraform"
         run: |
           sudo apt-get update && sudo apt-get install -y gnupg software-properties-common
@@ -50,14 +63,20 @@ jobs:
           echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/hashicorp.list
           sudo apt-get update
           sudo apt-get install terraform
-      - name: Checkout
-        uses: actions/checkout@v3
+          
       - name: "Terraform init"
         run: |
-          ls -a
-          terraform -chdir=cloudops/oracle init
+          terraform -chdir=iac/oracle init
+          
       - name: "Terraform apply"
-        run: terraform -chdir=cloudops/oracle apply -auto-approve -var COMPARTMENT_ID="${{env.OCID}}" -var REGION="${{env.OCI_REGION}}"
-        # with:
-          # cli_config_credentials_token: ${{ steps.fetch-credential.outputs.OCID }}
+        run: |
+          terraform -chdir=iac/oracle apply 
 
+
+
+      # - name: 'Prepare SSH key and config'
+      #   run: |
+      #     mkdir -p ~/.ssh
+      #     echo "${{ env.SSH_PRIVATE_KEY_FILE }}" > ~/.ssh/id_rsa
+      #     echo "${{ env.SSH_PUBLIC_KEY_FILE }}" > ~/.ssh/id_rsa.pub
+      #     chmod 600 ~/.ssh/id_rsa
