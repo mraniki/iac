@@ -41,12 +41,6 @@ jobs:
           # echo "key_file=~/.oci/key.pem" >> ~/.oci/config
         shell: bash
 
-      - name: "Fix OCI Config File Permissions"
-        run: |
-          oci setup repair-file-permissions --file /home/runner/.oci/config
-          oci setup repair-file-permissions --file /home/runner/.oci/key.pem
-        shell: bash
-
       - name: "Install OCI CLI"
         run: |
           curl -L -O https://raw.githubusercontent.com/oracle/oci-cli/master/scripts/install/install.sh
@@ -54,7 +48,13 @@ jobs:
           ./install.sh --accept-all-defaults
           echo "/home/runner/bin" >> $GITHUB_PATH
           exec -l $SHELL
-          
+  
+      - name: "Fix OCI Config File Permissions"
+        run: |
+          oci setup repair-file-permissions --file /home/runner/.oci/config
+          oci setup repair-file-permissions --file /home/runner/.oci/key.pem
+        shell: bash
+
       - name: "Install terraform"
         run: |
           sudo apt-get update && sudo apt-get install -y gnupg software-properties-common
