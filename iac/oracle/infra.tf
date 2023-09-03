@@ -186,7 +186,7 @@ resource "oci_containerengine_cluster" "k8s_cluster" {
 #}
 
 data "oci_identity_availability_domains" "AvailabilityDomains" {
-    compartment_id = var.tenancy_ocid
+    compartment_id = var.TENANCY_ID
 }
 #data "oci_identity_fault_domains" "FaultDomains" {
   #  availability_domain = data.oci_identity_availability_domains.AvailabilityDomains.availability_domains[0]["name"]
