@@ -8,10 +8,11 @@ jobs:
   apply:
     runs-on: ubuntu-latest
     steps:
-      - name: Install 1Password CLI
-        uses: 1password/install-cli-action@v1
+      # - name: Install 1Password CLI
+      #   uses: 1password/install-cli-action@v1
 
       - name: Load credentials
+        # id: fetch-credentials
         uses: 1password/load-secrets-action@v1
         with:
           export-env: true
@@ -26,8 +27,8 @@ jobs:
       - name: 'Prepare SSH key and config'
         run: |
           mkdir -p ~/.ssh
-          echo "${{ secrets.SSH_PRIVATE_KEY_FILE }}" > ~/.ssh/id_rsa
-          echo "${{ secrets.SSH_PUBLIC_KEY_FILE }}" > ~/.ssh/id_rsa.pub
+          echo "${{ env.SSH_PRIVATE_KEY_FILE }}" > ~/.ssh/id_rsa
+          echo "${{ env.SSH_PUBLIC_KEY_FILE }}" > ~/.ssh/id_rsa.pub
           chmod 600 ~/.ssh/id_rsa
       - name: "Install OCI CLI"
         run: |
@@ -57,3 +58,6 @@ jobs:
           terraform -chdir=cloudops/oracle init
       - name: "Terraform apply"
         run: terraform -chdir=cloudops/oracle apply -auto-approve -var COMPARTMENT_ID="${{env.OCID}}" -var REGION="${{env.OCI_REGION}}"
+        # with:
+          # cli_config_credentials_token: ${{ steps.fetch-credential.outputs.OCID }}
+
