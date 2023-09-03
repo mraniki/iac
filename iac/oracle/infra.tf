@@ -180,10 +180,10 @@ data "oci_identity_availability_domains" "ads" {
   compartment_id = var.COMPARTMENT_ID
 }
 
-locals {
+#locals {
   # Gather a list of availability domains for use in configuring placement_configs
-  azs = data.oci_identity_availability_domains.ads.availability_domains[*].name
-}
+ # azs = data.oci_identity_availability_domains.ads.availability_domains[*].name
+#}
 
 data "oci_core_images" "latest_image" {
   compartment_id = var.COMPARTMENT_ID
