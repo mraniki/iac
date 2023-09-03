@@ -185,6 +185,7 @@ data "oci_identity_availability_domains" "ads" {
  # azs = data.oci_identity_availability_domains.ads.availability_domains[*].name
 #}
 
+
 data "oci_core_images" "latest_image" {
   compartment_id = var.COMPARTMENT_ID
   operating_system = "Oracle Linux"
@@ -202,12 +203,19 @@ resource "oci_containerengine_node_pool" "k8s_node_pool" {
   kubernetes_version = "v1.26.2"
   name               = "k8s-node-pool"
   node_config_details {
-    dynamic placement_configs {
-      for_each = local.azs
-      content {
-        availability_domain = placement_configs.value
-        subnet_id           = oci_core_subnet.vcn_private_subnet.id
-      }
+    placement_configs {
+      availability_domain = data.oci_identity_availability_domains.ads.availability_domains[0].name
+      subnet_id           = oci_core_subnet.vcn_private_subnet.id
+    }
+
+    placement_configs {
+      availability_domain = data.oci_identity_availability_domains.ads.availability_domains[1].name
+      subnet_id           = oci_core_subnet.vcn_private_subnet.id
+    }
+
+    placement_configs {
+      availability_domain = data.oci_identity_availability_domains.ads.availability_domains[2].name
+      subnet_id           = oci_core_subnet.vcn_private_subnet.id
     }
     size = 4
 
