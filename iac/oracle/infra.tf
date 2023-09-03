@@ -1,6 +1,3 @@
-provider "oci" {
-  region = var.REGION
-}
 
 module "vcn" {
   source  = "oracle-terraform-modules/vcn/oci"
