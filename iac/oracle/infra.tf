@@ -1,7 +1,13 @@
+provider "oci" {
+  region = var.REGION
+}
 
 module "vcn" {
   source  = "oracle-terraform-modules/vcn/oci"
   version = "3.1.0"
+
+  compartment_id = var.COMPARTMENT_ID
+  region         = var.REGION
 
   internet_gateway_route_rules = null
   local_peering_gateways       = null
@@ -17,6 +23,7 @@ module "vcn" {
 }
 
 resource "oci_core_security_list" "private_subnet_sl" {
+  compartment_id = var.COMPARTMENT_ID
   vcn_id         = module.vcn.vcn_id
 
   display_name = "k8s-private-subnet-sl"
@@ -59,6 +66,7 @@ resource "oci_core_security_list" "private_subnet_sl" {
 }
 
 resource "oci_core_security_list" "public_subnet_sl" {
+  compartment_id = var.COMPARTMENT_ID
   vcn_id         = module.vcn.vcn_id
 
   display_name = "k8s-public-subnet-sl"
@@ -124,6 +132,7 @@ resource "oci_core_security_list" "public_subnet_sl" {
 }
 
 resource "oci_core_subnet" "vcn_private_subnet" {
+  compartment_id = var.COMPARTMENT_ID
   vcn_id         = module.vcn.vcn_id
   cidr_block     = "10.0.1.0/24"
 
@@ -134,6 +143,7 @@ resource "oci_core_subnet" "vcn_private_subnet" {
 }
 
 resource "oci_core_subnet" "vcn_public_subnet" {
+  compartment_id = var.COMPARTMENT_ID
   vcn_id         = module.vcn.vcn_id
   cidr_block     = "10.0.0.0/24"
 
@@ -143,6 +153,7 @@ resource "oci_core_subnet" "vcn_public_subnet" {
 }
 
 resource "oci_containerengine_cluster" "k8s_cluster" {
+  compartment_id     = var.COMPARTMENT_ID
   kubernetes_version = "v1.26.2"
   name               = "k8s-cluster"
   vcn_id             = module.vcn.vcn_id
@@ -165,6 +176,9 @@ resource "oci_containerengine_cluster" "k8s_cluster" {
   }
 }
 
+data "oci_identity_availability_domains" "ads" {
+  compartment_id = var.COMPARTMENT_ID
+}
 
 locals {
   # Gather a list of availability domains for use in configuring placement_configs
@@ -172,6 +186,7 @@ locals {
 }
 
 data "oci_core_images" "latest_image" {
+  compartment_id = var.COMPARTMENT_ID
   operating_system = "Oracle Linux"
   operating_system_version = "8"
   filter {
@@ -183,6 +198,7 @@ data "oci_core_images" "latest_image" {
 
 resource "oci_containerengine_node_pool" "k8s_node_pool" {
   cluster_id         = oci_containerengine_cluster.k8s_cluster.id
+  compartment_id     = var.COMPARTMENT_ID
   kubernetes_version = "v1.26.2"
   name               = "k8s-node-pool"
   node_config_details {
@@ -215,6 +231,7 @@ resource "oci_containerengine_node_pool" "k8s_node_pool" {
 }
 
 resource "oci_artifacts_container_repository" "docker_repository" {
+  compartment_id = var.COMPARTMENT_ID
   display_name   = "kubernetes-nginx"
 
   is_immutable = false
