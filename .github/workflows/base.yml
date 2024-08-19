@@ -22,7 +22,7 @@ jobs:
           HCLOUD_TOKEN: "op://git/p_hzn/HCLOUD_TOKEN"
 
       - name: Terraform
-        uses: hashicorp/setup-terraform@v2
+        uses: hashicorp/setup-terraform@v3
         with:
           cli_config_credentials_token: ${{ steps.op-load-secrets.outputs.TF_API_TOKEN }}
 
